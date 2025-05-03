@@ -1,6 +1,8 @@
 "use client";
 
-import type React from "react";
+import React from "react";
+import type { FC } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
@@ -15,12 +17,9 @@ import {
   Bell,
   Search,
 } from "lucide-react";
+import { LayoutProps } from "@/types";
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const Layout: FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   // const { data: session } = useSession();
 
@@ -208,4 +207,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   );
 };
 
-export default DashboardLayout;
+export default Layout;

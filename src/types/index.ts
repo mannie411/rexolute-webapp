@@ -9,11 +9,6 @@ import type {
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 
-export * from "./library";
-export * from "./search";
-export * from "./taxonomy";
-export * from "./analytics";
-
 export type QueryReturnValue<T = unknown, E = unknown, M = unknown> =
   | {
       error: E;
@@ -93,3 +88,7 @@ export type MenuLink = LinkProps & {
 };
 
 export type Error = { detail: string; message?: string };
+
+export interface LayoutProps {
+  children: React.ReactNode;
+}

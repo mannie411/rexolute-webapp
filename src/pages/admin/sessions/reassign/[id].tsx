@@ -5,7 +5,7 @@ import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import DashboardLayout from "@/components/layout/AdminLayout";
 import { ChevronLeft, Search, Filter, ArrowUpDown } from "lucide-react";
 
 interface Therapist {
