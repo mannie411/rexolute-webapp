@@ -14,7 +14,7 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-  allowedDevOrigins: ["*.localhost", "*.localhost"],
+  allowedDevOrigins: ["app.localhost", "admin.localhost"],
 };
 
 export default nextConfig;

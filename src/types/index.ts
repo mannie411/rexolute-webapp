@@ -92,3 +92,16 @@ export type Error = { detail: string; message?: string };
 export interface LayoutProps {
   children: React.ReactNode;
 }
+
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children?: ReactNode;
+  className?: string;
+}
+
+export type MenuProps = {
+  name: string;
+  path: string;
+  icon: any;
+};

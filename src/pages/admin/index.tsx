@@ -1,12 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
-import DashboardLayout from "@/components/layout/AdminLayout";
-import { Calendar } from "lucide-react";
+import { AdminLayout as DashboardLayout } from "@/components/layout";
+import { Calendar, ChevronDown, Download } from "lucide-react";
+import {
+  StatsCards,
+  SessionBreakdown,
+  UserSignupChart,
+  GenderDistribution,
+  TherapyReasons,
+  SessionTypeBreakdown,
+  OtherStats,
+  TopPerformers,
+} from "@/components/admin/dashboard";
+import { Button } from "@/components/ui/button";
 
 interface Task {
   id: string;
@@ -26,11 +37,52 @@ export default function Page({ pendingTasks }: DashboardProps) {
   const [activeTab, setActiveTab] = useState("reassigned");
 
   return (
-    <DashboardLayout>
+    <Fragment>
       <Head>
         <title>Dashboard | Rexolute</title>
       </Head>
-    </DashboardLayout>
+
+      <div className="flex flex-col gap-6 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              Below is overview stats of various activities
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              Jan 6, 2022 - Jan 13, 2022
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+          </div>
+        </div>
+
+        <StatsCards />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <SessionBreakdown />
+          <UserSignupChart />
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <GenderDistribution />
+          <TherapyReasons />
+        </div>
+
+        <SessionTypeBreakdown />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <OtherStats />
+          <TopPerformers />
+        </div>
+      </div>
+    </Fragment>
   );
 }
 

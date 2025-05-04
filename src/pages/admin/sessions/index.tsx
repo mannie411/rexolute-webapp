@@ -5,7 +5,7 @@ import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
-import DashboardLayout from "@/components/layout/AdminLayout";
+import DashboardLayout from "@/components/layout/admin-layout";
 import { Calendar } from "lucide-react";
 
 interface Task {

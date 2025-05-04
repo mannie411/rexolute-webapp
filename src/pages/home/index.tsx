@@ -11,11 +11,10 @@ const Page = () => {
   return (
     <Fragment>
       <Head title="Welcome to Rexolute" />
-      <HomeLayout>
-        <section className="flex h-screen w-screen justify-center items-center">
-          <h1>Home</h1>
-        </section>
-      </HomeLayout>
+
+      <section className="flex h-screen w-screen justify-center items-center">
+        <h1>Home</h1>
+      </section>
     </Fragment>
   );
 };
