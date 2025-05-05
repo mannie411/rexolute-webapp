@@ -7,4 +7,6 @@ export * from "./session-type-breakdown";
 export * from "./stats-cards";
 export * from "./therapy-reasons";
 export * from "./top-performers";
+export * from "./tables";
+export * from "./tabs";
 export * from "./user-signup-chart";

@@ -105,3 +105,27 @@ export type MenuProps = {
   path: string;
   icon: any;
 };
+
+type Role = "admin" | "client" | "therapist";
+
+export type User = {
+  id?: string;
+  name: string;
+  email: string;
+  gender: string;
+  profileImg: string;
+  role: Role;
+};
+
+export type Therapist = User & {
+  degree: string;
+  experience: string;
+  specialty: number;
+  rating: number;
+};
+
+export type Client = User & {
+  type: "default" | "student";
+};
+
+export type DetailsMode = "approve" | "default" | "reassign" | "rescheduled ";

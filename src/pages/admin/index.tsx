@@ -5,10 +5,9 @@ import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
-import { AdminLayout as DashboardLayout } from "@/components/layout";
 import { Calendar, ChevronDown, Download } from "lucide-react";
 import {
-  StatsCards,
+  DashboardStatsCards,
   SessionBreakdown,
   UserSignupChart,
   GenderDistribution,
@@ -63,7 +62,7 @@ export default function Page({ pendingTasks }: DashboardProps) {
           </div>
         </div>
 
-        <StatsCards />
+        <DashboardStatsCards />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <SessionBreakdown />
@@ -87,7 +86,7 @@ export default function Page({ pendingTasks }: DashboardProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context);
+  // const session = await getSession(context);
 
   // if (!session) {
   //   return {

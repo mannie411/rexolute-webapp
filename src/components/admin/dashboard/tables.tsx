@@ -16,8 +16,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ConfirmModal } from "../modals/indext";
+import { useRouter } from "next/router";
 
 export function UserTable() {
+  const router = useRouter();
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [isCustomOpen, setIsCustomOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -128,7 +130,11 @@ export function UserTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View details</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/admin/users/details/1")}
+                      >
+                        View details
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Edit user</DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setIsConfirmationOpen(true)}

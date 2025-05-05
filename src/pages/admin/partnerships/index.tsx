@@ -1,22 +1,24 @@
 import React, { Fragment } from "react";
 import { Calendar, ChevronDown, Download, Filter, Search } from "lucide-react";
-import { AdminLayout as DashboardLayout } from "@/components/layout";
 import { Head } from "@/components/shared";
-import { UserTable, UserTabs } from "@/components/admin/dashboard";
+import {
+  PartnershipStatsCards,
+  UserTable,
+  UserTabs,
+} from "@/components/admin/dashboard";
 import { Button, Input } from "@/components/ui";
-import { UserStatsCards } from "@/components/admin/dashboard";
 
 const Page = () => {
   return (
     <Fragment>
-      <Head title="User management" />
+      <Head title="Partnership mgt" />
 
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">User management</h1>
+            <h1 className="text-2xl font-semibold">Partnerships management</h1>
             <p className="text-sm text-muted-foreground">
-              Keep track of users and their activities
+              Keep track of partners and their activities
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -32,7 +34,7 @@ const Page = () => {
           </div>
         </div>
 
-        <UserStatsCards />
+        <PartnershipStatsCards />
         <UserTabs />
 
         <div className="flex items-center justify-between">
