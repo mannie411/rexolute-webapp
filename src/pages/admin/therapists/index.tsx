@@ -71,7 +71,7 @@ const Page = () => {
           <TabsContent value="inactive">
             <div>
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Student users list</h2>
+                <h2 className="text-xl font-semibold">Therapist list</h2>
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -99,7 +99,9 @@ const Page = () => {
           <TabsContent value="suspended">
             <div>
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Student users list</h2>
+                <h2 className="text-xl font-semibold">
+                  Inactive therapist list
+                </h2>
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
