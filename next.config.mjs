@@ -15,6 +15,22 @@ const nextConfig = {
     parallelServerCompiles: true,
   },
   allowedDevOrigins: ["app.localhost", "admin.localhost"],
+  async redirects() {
+    return [
+      // Basic redirect
+      {
+        source: "/auth/admin",
+        destination: "/auth/admin/login",
+        permanent: true,
+      },
+      // Wildcard path matching
+      // {
+      //   source: '/blog/:slug',
+      //   destination: '/news/:slug',
+      //   permanent: true,
+      // },
+    ];
+  },
 };
 
 export default nextConfig;
