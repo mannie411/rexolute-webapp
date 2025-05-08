@@ -1,20 +1,24 @@
 import type { Metadata } from 'next'
+import HomeLayer from './layout/HomeLayer'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'Revolute App',
+  description: 'Your financial companion',
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <HomeLayer>
+          {children}
+        </HomeLayer>
+      </body>
     </html>
   )
 }
