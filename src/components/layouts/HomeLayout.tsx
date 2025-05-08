@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Header from '../ui/Header';
+import Footer from '../ui/Footer';
 
 export default function HomeLayout({ children }: { children: ReactNode }) {
   return (
@@ -8,7 +9,7 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
       <main className="flex-grow">
         {children}
       </main>
-      {/* <Footer /> Uncomment when you implement footer */}
+      <Footer /> 
     </div>
   );
 }
