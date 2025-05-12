@@ -9,11 +9,6 @@ import type {
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 
-export * from "./library";
-export * from "./search";
-export * from "./taxonomy";
-export * from "./analytics";
-
 export type QueryReturnValue<T = unknown, E = unknown, M = unknown> =
   | {
       error: E;
@@ -93,3 +88,44 @@ export type MenuLink = LinkProps & {
 };
 
 export type Error = { detail: string; message?: string };
+
+export interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children?: ReactNode;
+  className?: string;
+}
+
+export type MenuProps = {
+  name: string;
+  path: string;
+  icon: any;
+};
+
+type Role = "admin" | "client" | "therapist";
+
+export type User = {
+  id?: string;
+  name: string;
+  email: string;
+  gender: string;
+  profileImg: string;
+  role: Role;
+};
+
+export type Therapist = User & {
+  degree: string;
+  experience: string;
+  specialty: number;
+  rating: number;
+};
+
+export type Client = User & {
+  type: "default" | "student";
+};
+
+export type DetailsMode = "approve" | "default" | "reassign" | "rescheduled ";

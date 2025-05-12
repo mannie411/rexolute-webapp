@@ -1,4 +1,4 @@
-import NoSSR from "./NoSSR";
-import Head from "./Head";
+import NoSSR from "./no-ssr";
+import Head from "./head";
 
 export { Head, NoSSR };

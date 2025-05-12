@@ -1,3 +1,4 @@
+import { fontFamily } from "tailwindcss/defaultTheme";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -5,6 +6,12 @@ const config: Config = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        onest: ["var(--font-onest)", ...fontFamily.sans],
+        inter: ["var(--font-inter)", ...fontFamily.sans],
+        poppins: ["var(--font-poppins)", ...fontFamily.sans],
+        roboto: ["var(--font-roboto)", ...fontFamily.sans],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -55,6 +62,9 @@ const config: Config = {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        modal: {
+          DEFAULT: "hsl(var(--modal-primary))",
         },
       },
       backgroundImage: {
