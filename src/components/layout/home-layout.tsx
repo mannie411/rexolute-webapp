@@ -190,7 +190,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             {/* Legal Links */}
             <div className="flex gap-4">
               <Link
-                href="/terms"
+                href="/home/terms-condition"
                 className="text-gray-400 hover:text-green-400 text-sm"
               >
                 Terms
