@@ -27,7 +27,7 @@ const ContactPage = () => {
           <div className="bg-black p-8 rounded-lg text-white">
             <h2 className="text-2xl font-semibold mb-4">Contact Information</h2>
             <p className="text-gray-300 mb-6">
-              Fill up the form and we'll get back to you in few hours.
+              Fill up the form and we will get back to you in few hours.
             </p>
             <div className="space-y-4">
               <p className="flex items-center gap-3">
