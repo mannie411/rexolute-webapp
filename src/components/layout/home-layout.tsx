@@ -11,55 +11,49 @@ import { logoGreen, logoWhite } from "@/assets/svg";
 const Layout: FC<LayoutProps> = ({ children }) => {
   return (
     <Fragment>
-      <header className="bg-white py-4 px-6 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <Link href={"/home"}>
-              <Image src={logoGreen} alt={"Rexolute Logo"} />
-            </Link>
-          </div>
+      <header className="bg-white py-4 border-b border-gray-200">
+  <div className="max-w-7xl mx-auto px-6 lg:px-20 flex items-center justify-between">
+    {/* Logo */}
+    <div>
+      <Link href="/home">
+        <Image src={logoGreen} alt="Rexolute Logo" />
+      </Link>
+    </div>
 
-          <nav className="hidden md:flex space-x-8">
-            <Link href="/home" className="text-gray-800 hover:text-green-600">
-              Home
-            </Link>
-            <Link
-              href="/home/about-us"
-              className="text-gray-800 hover:text-green-600"
-            >
-              About us
-            </Link>
-            <Link
-              href="/blog"
-              className="text-gray-800 hover:text-green-600 hidden"
-            >
-              Blog
-            </Link>
-            <Link
-              href="/home/contact-us"
-              className="text-gray-800 hover:text-green-600"
-            >
-              Contact us
-            </Link>
-          </nav>
+    {/* Nav Links */}
+    <nav className="hidden md:flex space-x-8">
+      <Link href="/home" className="text-gray-800 hover:text-green-600">
+        Home
+      </Link>
+      <Link href="/home/about-us" className="text-gray-800 hover:text-green-600">
+        About us
+      </Link>
+      <Link href="/blog" className="text-gray-800 hover:text-green-600 hidden">
+        Blog
+      </Link>
+      <Link href="/home/contact-us" className="text-gray-800 hover:text-green-600">
+        Contact us
+      </Link>
+    </nav>
 
-          <div className="flex items-center space-x-6">
-            <Link
-              href="login"
-              className="text-gray-800 hover:text-green-600 hidden"
-            >
-              Login
-            </Link>
-            <Link
-              href="#"
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-            >
-              Get started
-            </Link>
-          </div>
-        </div>
-      </header>
+    {/* Buttons */}
+    <div className="flex items-center space-x-6">
+      <Link href="login" className="text-gray-800 hover:text-green-600 hidden">
+        Login
+      </Link>
+      <Link
+        href="#"
+        className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+      >
+        Get started
+      </Link>
+    </div>
+  </div>
+</header>
+
       <main>{children}</main>
+
+      
       <footer className="bg-black text-white py-12 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left Column - Brand Info */}

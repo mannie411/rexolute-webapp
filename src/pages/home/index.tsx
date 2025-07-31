@@ -214,26 +214,45 @@ const Page = () => {
     <div className="text-center mb-14">
       <h2 className="text-white text-4xl font-extrabold mb-3">How it works?</h2>
       <p className="text-white/80 text-base max-w-xl mx-auto">
-        step-by-step guide to using the service
+        Step-by-step guide to using the service
       </p>
     </div>
 
-    {/* IMAGE + STEPPER */}
-    <div className="flex flex-col md:flex-row items-start gap-12">
+    {/* IMAGE + TEXT */}
+    <div className="flex flex-col md:flex-row items-center md:items-start gap-12">
       
-      {/* LEFT IMAGE */}
-      <div className="flex justify-start pl-20">
-        <Image
-          src="/pictures/pic7.jpg"
-          alt="How it works illustration"
-          width={500}
-          height={200}
-          className="rounded-lg object-cover"
-        />
+      {/* Left BG.svg Image */}
+    <div className="relative w-[500px] h-[350px] overflow-hidden"> 
+        <div className="scale-[1.2] -translate-y-6 transform origin-top-left">
+      <Image
+      src="/svg/BG.svg"
+      alt="Background"
+      width={200}
+      height={80}
+       className="absolute top-70px left-[57%] -translate-x-1/2"
+    />
+
+    {/* img.svg floating on top */}
+    <Image
+      src="/svg/img.svg"
+      alt="Floating Image"
+      width={300}
+      height={500}
+     className="absolute top-[10px] left-[45%] -translate-x-1/2"
+    />
+
+     <Image
+      src="/svg/Notification1.svg"
+      alt="Floating Image"
+      width={250}
+      height={65}
+     className="absolute top-48 left-[35%] -translate-x-1/2"
+    />
+    </div>
       </div>
 
-      {/* RIGHT STEPS */}
-      <div className="relative flex flex-col pl-8">
+      {/* Right Steps (NO rubbish text anymore) */}
+      <div className="relative flex flex-col pl-4 ml-[70px]">
         {[
           { num: "1", title: "Choose therapy type" },
           { num: "2", title: "Fill a brief assessment questionnaire" },
@@ -241,28 +260,25 @@ const Page = () => {
           { num: "4", title: "Start your therapy session" },
         ].map((step, idx) => (
           <div key={idx} className="flex items-start gap-4 relative mb-10 last:mb-0">
-            
-            {/* Vertical line behind circles */}
+
+            {/* Vertical line */}
             <div className="absolute left-4 top-4 w-px h-full bg-white/30"></div>
-            
-            {/* Circle */}
-            <div className="z-10 w-8 h-8 flex items-center justify-center rounded-full border-2 border-white text-white font-bold bg-transparent">
+
+            {/* Circle Number */}
+            <div className="z-10 w-8 h-8 flex items-center justify-center rounded-full border-2 border-white text-white font-bold">
               {step.num}
             </div>
 
-            {/* Text */}
-            <div>
-              <h3 className="text-white text-lg font-bold mb-1">{step.title}</h3>
-              <p className="text-white/80 text-sm leading-relaxed max-w-xs">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
-              </p>
-            </div>
+            {/* Title only */}
+            <h3 className="text-white text-lg font-bold">{step.title}</h3>
+
           </div>
         ))}
       </div>
     </div>
   </div>
 </section>
+
 
 <div className="w-full px-6 mb-12">
   <p className="text-[#AD8616] font-semibold text-sm mb-2">USERS FEEDBACK</p>
@@ -391,13 +407,15 @@ const Page = () => {
 
   {/* Right side: Image */}
   <div className="flex-1 flex justify-center md:justify-end">
-    <Image
-      src="/pictures/pic9.jpg"
-      alt="Mobile App"
-      width={300}
-      height={300}
-      className="rounded-lg object-contain w-full max-w-sm"
-    />
+
+<Image
+  src="/pictures/pic9.jpg"
+  alt="Test"
+  width={300}
+  height={300}
+  className="rounded-lg object-contain w-full max-w-sm"
+/>
+
   </div>
 </div>
 </div>
