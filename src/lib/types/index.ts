@@ -106,7 +106,7 @@ export type MenuProps = {
   icon: any;
 };
 
-type Role = "admin" | "client" | "therapist";
+export type Role = "admin" | "anonymous" | "client" | "therapist" | "unknown";
 
 export type User = {
   id?: string;
@@ -129,3 +129,19 @@ export type Client = User & {
 };
 
 export type DetailsMode = "approve" | "default" | "reassign" | "rescheduled ";
+
+/**
+ * Takes a token, and returns a new token with updated
+ * `accessToken` and `accessTokenExpires`. If an error occurs,
+ * returns the old token and an error property
+ */
+export type AuthToken = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export interface PageProps {
+  query: any;
+  slug: string;
+  title: string;
+}

@@ -26,7 +26,25 @@ export default async function middleware(req: NextRequest) {
   const hostname = req.headers.get("host") || appUrl;
 
   // Get the pathname of the request (e.g. /, /about, /blog/first-post)
-  const path = url.pathname;
+  const pathname = url.pathname;
+
+  const token = await getToken({ req });
+
+  // ADMIN protected
+  if (pathname.startsWith("/admin")) {
+    if (!token || token.role !== "admin") {
+      return NextResponse.rewrite(new URL("/auth/admin/login", req.url));
+    }
+  }
+
+  // CLIENT protected
+  if (pathname.startsWith("/client")) {
+    if (!token || token.role !== "client") {
+      return NextResponse.rewrite(new URL("/auth/client/login", req.url));
+    }
+  }
+
+  return;
 
   // Only for demo purposes - remove this if you want to use your root domain as the landing page
   // if (hostname === "vercel.pub" || hostname === "platforms.vercel.app") {

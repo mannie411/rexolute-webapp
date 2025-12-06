@@ -2,9 +2,9 @@ import React, { Fragment } from "react";
 import { Calendar, ChevronDown, Download, Filter, Search } from "lucide-react";
 import { AdminLayout as DashboardLayout } from "@/components/layout";
 import { Head } from "@/components/shared";
-import { UserTable, UserTabs } from "@/components/admin/dashboard";
+import { UserTable, UserTabs } from "@/components/admin/dashboard/index";
 import { Button, Input } from "@/components/ui";
-import { UserStatsCards } from "@/components/admin/dashboard";
+import { UserStatsCards } from "@/components/admin/dashboard/index";
 
 const Page = () => {
   return (

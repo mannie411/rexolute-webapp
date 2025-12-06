@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
 import { Calendar, ChevronDown, Download, Filter, Search } from "lucide-react";
 import { Head } from "@/components/shared";
-import { UserTable, UserTabs } from "@/components/admin/dashboard";
+import { UserTable, UserTabs } from "@/components/admin/dashboard/index";
 import { Button, Input, Tabs, TabsList, TabsTrigger } from "@/components/ui";
-import { TherapistStatsCards } from "@/components/admin/dashboard";
+import { TherapistStatsCards } from "@/components/admin/dashboard/index";
 import { TabsContent } from "@radix-ui/react-tabs";
 
 const Page = () => {

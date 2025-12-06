@@ -2,7 +2,10 @@ import { ArrowLeft, Calendar, ChevronDown, Phone } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-import { DashboardHeader, DashboardNav } from "@/components/admin/dashboard";
+import {
+  DashboardHeader,
+  DashboardNav,
+} from "@/components/admin/dashboard/index";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {

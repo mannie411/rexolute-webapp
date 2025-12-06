@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import type { ReactNode } from "react";
-import { useErrorHandler } from "@app/hooks";
+import { useErrorHandler } from "@/hooks";
 
 const WithErrorBoundary = ({
   children,

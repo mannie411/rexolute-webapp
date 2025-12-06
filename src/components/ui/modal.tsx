@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ModalProps } from "@/types";
+import { ModalProps } from "@/lib/types";
 
 export function Modal({ isOpen, onClose, children, className }: ModalProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,7 +26,7 @@ export function Modal({ isOpen, onClose, children, className }: ModalProps) {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-modal p-4 transition-opacity",
+        "fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity",
         isOpen ? "opacity-100" : "opacity-0"
       )}
       onClick={onClose}

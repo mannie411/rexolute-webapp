@@ -5,7 +5,7 @@ import {
   PartnershipStatsCards,
   UserTable,
   UserTabs,
-} from "@/components/admin/dashboard";
+} from "@/components/admin/dashboard/index";
 import { Button, Input } from "@/components/ui";
 
 const Page = () => {

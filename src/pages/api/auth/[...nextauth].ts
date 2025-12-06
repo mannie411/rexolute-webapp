@@ -1,53 +1,97 @@
-import NextAuth from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { jwtDecode } from "jwt-decode";
+
+import { ApiClient as api } from "@/lib/api";
 
 export default NextAuth({
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        // This is where you would typically verify against your database
-        // For demo purposes, we'll use a mock user
-        if (credentials?.email === "admin@rexolute.com" && credentials?.password === "password") {
-          return {
-            id: "1",
-            name: "Okey Davids",
-            email: "admin@rexolute.com",
-            image:
-              "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Approve%20prof.%20info..png-rftDchyYv52zz5hQCXZcPdFJboaRBw.jpeg",
-          }
-        }
+  secret: process.env.NEXTAUTH_SECRET,
 
-        return null
-      },
-    }),
-  ],
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: "/auth/signin",
+    verifyRequest: "/auth/verify",
+    error: "/auth/error",
   },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string
-      }
-      return session
-    },
-  },
+
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET,
-})
 
+  providers: [
+    CredentialsProvider({
+      id: "admin-auth",
+      name: "admin-auth",
+      credentials: {
+        code: { label: "OTP", type: "text" },
+        identity: { label: "Identity", type: "text" },
+        provider: { label: "Provider", type: "text" },
+      },
+      authorize: async (credentials) => {
+        const { code, identity, provider } = credentials || {};
+        console.log("verifying...", { identity });
+        const res = await api.post("/auth/verify-otp?mode=token", {
+          provider: provider,
+          payload: {
+            identity: identity,
+            code: code,
+          },
+        });
+
+        const { data } = res.data;
+        const accessToken = data?.access_token;
+        const refreshToken = data?.refresh_token;
+
+        if (!accessToken || !refreshToken) return null;
+
+        const decoded: any = jwtDecode(accessToken);
+
+        return {
+          id: decoded.sub,
+          email: identity,
+          role: decoded.role,
+          permissions: decoded.permissions,
+          accessToken,
+          refreshToken,
+        };
+      },
+    }),
+  ],
+
+  callbacks: {
+    /**
+     * Runs whenever a JWT is created or updated
+     */
+    async jwt({ token, user }) {
+      if (user) {
+        const accessToken = (user as any).accessToken;
+        const refreshToken = (user as any).refreshToken;
+        const decoded: any = jwtDecode(accessToken);
+
+        token.id = user.id;
+        token.email = user.email;
+        token.role = decoded.role;
+        token.permissions = decoded.permissions;
+        token.accessToken = accessToken;
+        token.refreshToken = refreshToken;
+        token.expiresAt = decoded.exp * 1000;
+      }
+      return token;
+    },
+    /**
+     * Controls what is sent to the client inside session
+     */
+    async session({ session, token }) {
+      session.user = {
+        id: token.id,
+        email: token.email!,
+        role: token.role,
+        permissions: token.permissions,
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+      };
+
+      return session;
+    },
+  },
+});

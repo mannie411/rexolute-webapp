@@ -18,8 +18,8 @@ import {
   Bell,
   Search,
 } from "lucide-react";
-import { LayoutProps } from "@/types";
-import { ThemeProvider } from "../shared/theme-provider";
+import { LayoutProps, MenuProps } from "@/lib/types";
+import { ThemeProvider } from "../../shared/theme-provider";
 import {
   Toaster,
   Sidebar,
@@ -32,8 +32,8 @@ import {
   Button,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "../ui";
-import { MenuProps } from "@/types";
+  SidebarHeader,
+} from "../../ui";
 import { logoGreen } from "@/assets/svg";
 import { profileAvatarImg } from "@/assets/raster";
 
@@ -73,14 +73,15 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       <SidebarProvider>
         <Sidebar>
           {/* Sidebar */}
+          <SidebarHeader>
+            <div className="flex items-center p-4">
+              <Link href="/dashboard" className="flex items-center">
+                <Image src={logoGreen} alt="Rexolute Logo" />
+              </Link>
+            </div>
+          </SidebarHeader>
           <SidebarContent>
             <div className="">
-              <div className="flex items-center p-4">
-                <Link href="/dashboard" className="flex items-center">
-                  <Image src={logoGreen} alt="Rexolute Logo" />
-                </Link>
-              </div>
-
               <div className="p-4">
                 <div className="flex items-center mb-4">
                   <Link
@@ -131,25 +132,24 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                 </nav>
               </div>
             </div>
-            <SidebarFooter>
-              <SidebarTrigger />
-            </SidebarFooter>
           </SidebarContent>
+          <SidebarFooter>{/* <SidebarTrigger /> */}</SidebarFooter>
         </Sidebar>
         <div className="w-screen">
           {/* Top header */}
           <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
             <div className="flex items-center justify-between px-6 py-3">
-              <div>
-                <h1 className="text-lg font-semibold">
-                  Welcome,
-                  <div className="text-xl font-bold">
-                    {
-                      // session?.user?.name ||
-                      "Admin"
-                    }
-                  </div>
-                </h1>
+              <div className="flex items-center gap-8">
+                <SidebarTrigger />
+                <h6 className="text-xl font-bold text-[#17191C]">
+                  <span className="block text-[14px] font-medium text-[#5E5959]">
+                    Welcome,
+                  </span>
+                  {
+                    // session?.user?.name ||
+                    "Admin"
+                  }
+                </h6>
               </div>
 
               <div className="flex items-center space-x-4">

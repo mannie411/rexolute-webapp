@@ -18,7 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { DetailsMode } from "@/types";
+import { DetailsMode } from "@/lib/types";
 
 const Details: FC<{ mode: DetailsMode }> = ({ mode = "default" }) => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({

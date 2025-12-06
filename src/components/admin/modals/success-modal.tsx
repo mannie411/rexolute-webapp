@@ -1,4 +1,4 @@
-import { ModalProps } from "@/types";
+import { ModalProps } from "@/lib/types";
 import React, { FC } from "react";
 
 const SuccessModal: FC<ModalProps> = () => {

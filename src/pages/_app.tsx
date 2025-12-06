@@ -5,12 +5,14 @@ import dynamic from "next/dynamic"; // Import dynamic
 
 import "@/assets/globals.css";
 import { NoSSR } from "@/components/shared";
-import { AppPropsWithLayout } from "@/types";
+import { AppPropsWithLayout } from "@/lib/types";
 import { inter, onest, poppins } from "@/assets/fonts";
 
 // Dynamically import layouts
-const AdminLayout = dynamic(() => import("@/components/layout/admin-layout"));
-const HomeLayout = dynamic(() => import("@/components/layout/home-layout"));
+const AdminLayout = dynamic(
+  () => import("@/components/admin/layout/dashboard")
+);
+const HomeLayout = dynamic(() => import("@/components/home/layout"));
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();

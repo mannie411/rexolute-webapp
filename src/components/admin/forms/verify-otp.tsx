@@ -1,21 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Import useEffect
+import { useState, useEffect, FC } from "react"; // Import useEffect
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
+import { signIn } from "next-auth/react";
 
 import { Button, InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui";
 
 const RESEND_INTERVAL = 30; // Countdown time in seconds
 
-const VerifyOTPForm = () => {
+const VerifyOTPForm: FC<{ provider: string; identity: string }> = ({
+  provider,
+  identity,
+}) => {
   const router = useRouter();
   const [otp, setOtp] = useState<string>("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(RESEND_INTERVAL);
   const [resendDisabled, setResendDisabled] = useState(true);
+  const email = decodeURIComponent(identity);
 
   // Timer effect
   useEffect(() => {
@@ -40,43 +45,43 @@ const VerifyOTPForm = () => {
 
     console.log("Resending OTP...");
     // Add logic here to call the API to resend the OTP
-    // try {
-    //   await resendOtpApiCall(); // Replace with your actual API call
-    //   setError(""); // Clear previous errors
-    // } catch (resendError) {
-    //   setError("Failed to resend OTP. Please try again.");
-    //   return; // Stop if resend fails
-    // }
-
-    // Reset timer
-    setResendDisabled(true);
-    setCountdown(RESEND_INTERVAL);
+    try {
+      setError(""); // Clear previous errors
+    } catch (resendError) {
+      setError("Failed to resend OTP. Please try again.");
+      // Reset timer
+      setResendDisabled(true);
+      setCountdown(RESEND_INTERVAL);
+      return; // Stop if resend fails
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // ... existing handleSubmit logic ...
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
-    // Add logic to verify the OTP (using the 'otp' state)
     console.log("Verifying OTP:", otp);
 
     try {
-      // Simulate API call or verification logic
-      // if (verificationSuccessful) {
+      const res = await signIn("admin-auth", {
+        redirect: false,
+        code: otp,
+        identity: email,
+        provider,
+      });
+
+      if (res?.error) {
+        setError("Invalid OTP");
+        setIsLoading(false);
+        return;
+      }
+
       router.push("/admin");
-      // } else {
-      //   setError("Invalid OTP. Please try again.");
-      //   setIsLoading(false);
-      // }
     } catch (error) {
+      // setIsLoading(false);
+      console.log(error);
       setError("An error occurred. Please try again.");
       setIsLoading(false);
-    } finally {
-      // Ensure isLoading is set to false even if verification logic is commented out
-      // In a real scenario, this would likely be inside the try/catch based on success/failure
-      // setIsLoading(false);
     }
   };
 
@@ -98,7 +103,7 @@ const VerifyOTPForm = () => {
         </h1>
         <p className="text-muted-foreground">
           {/* Consider making the email dynamic */}
-          Enter OTP send to your email “asuquogodwin0@gmail.com”
+          Enter OTP send to your email “{email}”
         </p>
       </div>
 

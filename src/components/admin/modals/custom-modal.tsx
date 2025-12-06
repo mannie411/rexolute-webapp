@@ -7,7 +7,7 @@ import {
   ModalHeader,
   ModalIcon,
 } from "@/components/ui";
-import { ModalProps } from "@/types";
+import { ModalProps } from "@/lib/types";
 import { Info } from "lucide-react";
 
 const CustomModal: FC<ModalProps> = ({ isOpen, onClose }) => {

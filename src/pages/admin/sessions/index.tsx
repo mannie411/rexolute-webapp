@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { Calendar, ChevronDown, Download, Filter, Search } from "lucide-react";
 import { Head } from "@/components/shared";
 import { Button, Input } from "@/components/ui";
-import { SessionStatsCards } from "@/components/admin/dashboard";
+import { SessionStatsCards } from "@/components/admin/dashboard/index";
 import { SessionCard } from "@/components/admin/sessions";
 
 const Page = () => {

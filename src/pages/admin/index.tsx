@@ -15,7 +15,7 @@ import {
   SessionTypeBreakdown,
   OtherStats,
   TopPerformers,
-} from "@/components/admin/dashboard";
+} from "@/components/admin/dashboard/index";
 import { Button } from "@/components/ui/button";
 
 interface Task {

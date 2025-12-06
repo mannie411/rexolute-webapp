@@ -5,12 +5,36 @@ const config: Config = {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    container: {
+      center: true,
+      padding: {
+        sm: "1rem",
+        md: "2rem",
+        lg: "4rem",
+        xl: "6rem",
+        "2xl": "8rem",
+      },
+      screens: {
+        sm: "600px",
+        md: "728px",
+        lg: "984px",
+        xl: "1240px",
+        "2xl": "1440px",
+      },
+    },
     extend: {
       fontFamily: {
         onest: ["var(--font-onest)", ...fontFamily.sans],
         inter: ["var(--font-inter)", ...fontFamily.sans],
         poppins: ["var(--font-poppins)", ...fontFamily.sans],
         roboto: ["var(--font-roboto)", ...fontFamily.sans],
+      },
+      padding: {
+        sm: "1rem",
+        md: "2rem",
+        lg: "4rem",
+        xl: "6rem",
+        "2xl": "8rem",
       },
       colors: {
         background: "hsl(var(--background))",
@@ -19,6 +43,7 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
