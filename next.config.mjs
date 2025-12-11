@@ -14,9 +14,16 @@ const nextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    esmExternals: "loose",
   },
+
   webpack: (config, { isServer }) => {
     if (!isServer) {
+      config.module.rules.push({
+        test: /canvas/,
+        use: "null-loader",
+      });
+
       // Don't resolve 'fs' module on the client to prevent errors
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -30,7 +37,7 @@ const nextConfig = {
   },
 
   // Important: Ensure proper transpilation
-  transpilePackages: ["pdfjs-dist", "react-pdf", "react-doc-viewer"],
+  transpilePackages: ["pdfjs-dist", "react-pdf", "react-doc-viewer", "canvas"],
   allowedDevOrigins: ["app.localhost", "admin.localhost"],
   async redirects() {
     return [
