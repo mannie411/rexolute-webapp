@@ -15,7 +15,7 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
     // esmExternals: "loose",
-    legacyBrowsers: false,
+    // legacyBrowsers: false,
     outputFileTracingExcludes: ["**canvas**"],
   },
 
