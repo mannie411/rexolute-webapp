@@ -28,9 +28,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/__middleware.ts.orig",
-    "src/middleware.ts.bk",
-    "public/.sidebar.txt.old"
+    "src/*"
   ],
   "exclude": ["node_modules"]
 }

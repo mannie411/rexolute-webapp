@@ -1,4 +1,4 @@
-import { AuthToken } from "@/lib/types";
+import { AuthToken } from "@/types";
 
 async function refreshAccessToken(token: AuthToken) {
   try {

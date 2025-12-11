@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ModalProps } from "@/lib/types";
+import { ModalProps } from "@/types";
 
 export function Modal({ isOpen, onClose, children, className }: ModalProps) {
   const [isVisible, setIsVisible] = useState(false);

@@ -46,3 +46,7 @@ export * from "./toaster";
 export * from "./toggle";
 export * from "./toggle-group";
 export * from "./tooltip";
+
+import FileViewer from "./file-viewer";
+
+export { FileViewer };

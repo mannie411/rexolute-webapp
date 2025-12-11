@@ -1,14 +1,16 @@
 import { Fragment } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import dynamic from "next/dynamic"; // Import dynamic
+import { SessionProvider } from "next-auth/react";
+import dynamic from "next/dynamic";
 
+import { AppPropsWithLayout } from "@/types";
+import { inter, onest, poppins } from "@/assets/fonts";
 import "@/assets/globals.css";
 import { NoSSR } from "@/components/shared";
-import { AppPropsWithLayout } from "@/lib/types";
-import { inter, onest, poppins } from "@/assets/fonts";
 
 // Dynamically import layouts
+
 const AdminLayout = dynamic(
   () => import("@/components/admin/layout/dashboard")
 );
@@ -27,11 +29,27 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   let layout;
   if (isAdminRoute) {
-    layout = <AdminLayout>{pageContent}</AdminLayout>;
+    layout = (
+      <SessionProvider>
+        <NoSSR>
+          <AdminLayout>{pageContent}</AdminLayout>
+        </NoSSR>
+      </SessionProvider>
+    );
   } else if (isClientRoute) {
-    layout = pageContent; // Client routes use their own layout or default
+    layout = (
+      <SessionProvider>
+        <NoSSR>
+          {pageContent} // Client routes use their own layout or default
+        </NoSSR>
+      </SessionProvider>
+    );
   } else if (isHomeRoute) {
-    layout = <HomeLayout>{pageContent}</HomeLayout>;
+    layout = (
+      <NoSSR>
+        <HomeLayout>{pageContent}</HomeLayout>;
+      </NoSSR>
+    );
   } else {
     // Default case for routes not matching admin, client, or home
     layout = pageContent;
@@ -41,7 +59,11 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
     <Fragment>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* The upgrade-insecure-requests directive instructs browsers to treat all of site's insecure URLs (those served over HTTP) as though they have been replaced with secure URLs (those served over HTTPS). This is generally a good security practice. */}
+        {/*
+         *  The upgrade-insecure-requests directive instructs browsers to treat all of site's
+         *  insecure URLs (those served over HTTP) as though they have been replaced
+         * with secure URLs (those served over HTTPS). This is generally a good security practice.
+         * */}
         <meta
           httpEquiv="Content-Security-Policy"
           content="upgrade-insecure-requests"
@@ -58,7 +80,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         `}
       </style>
 
-      <NoSSR>{layout}</NoSSR>
+      {layout}
     </Fragment>
   );
 }

@@ -1,8 +1,27 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { jwtDecode } from "jwt-decode";
+import { AuthToken } from "@/types";
 
 import { ApiClient as api } from "@/lib/api";
+import { JWT } from "next-auth/jwt";
+
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  try {
+    const { data } = await api.post("/auth/refresh-token", {});
+    const decoded: any = jwtDecode(data);
+
+    return {
+      ...token,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token ?? token.refreshToken,
+      expiresAt: Date.now() + data.expires_in * 1000,
+    };
+  } catch (error) {
+    console.error("Refresh Token Error:", error);
+    return { ...token, error: "RefreshTokenError" };
+  }
+}
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -76,6 +95,15 @@ export default NextAuth({
         token.refreshToken = refreshToken;
         token.expiresAt = decoded.exp * 1000;
       }
+
+      // If token still valid → return it
+      // if (Date.now() < token.expiresAt) {
+      //   return token;
+      // }
+
+      // Refresh
+      // return refreshAccessToken(token);
+
       return token;
     },
     /**

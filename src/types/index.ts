@@ -145,3 +145,5 @@ export interface PageProps {
   slug: string;
   title: string;
 }
+
+export type FileType = "pdf" | "image" | "doc" | "unsupported";

@@ -2,7 +2,7 @@ import React, { FC, Fragment } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import { PageProps } from "@/lib/types";
+import { PageProps } from "@/types";
 import { Head } from "@/components/shared";
 import {
   CreatePasswordForm,
@@ -20,24 +20,22 @@ const AuthLayout: FC<PageProps> = ({ slug, query, title }) => {
       <div className="flex min-h-screen">
         {/* Left side - Green background with illustration */}
         <div className="hidden w-1/3 flex-col bg-[#205406] p-8 md:flex">
-          <div className="flex flex-col items-center gap-6 my-12">
+          <div className="flex flex-col items-center gap-6 my-8">
             <Link href={"/home"}>
               <Image
-                src="/graphics/svg/logos/white.svg"
+                src="/svg/logos/white.svg"
                 alt="Rexolute Logo"
                 priority
                 width={140}
                 height={40}
               />
             </Link>
-            <h2 className="mt-4 text-xl font-medium text-white">
-              ADMIN PORTAL
-            </h2>
+            <h2 className="text-xl font-medium text-white">ADMIN PORTAL</h2>
           </div>
 
           <div className="flex flex-1 ">
             <Image
-              src="/graphics/svg/admin-cuate.svg"
+              src="/svg/admin-cuate.svg"
               alt="Admin Portal Illustration"
               width={500}
               height={500}

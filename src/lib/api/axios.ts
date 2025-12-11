@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
-import { parseAxiosError } from "./error";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL + "/api",
@@ -28,8 +27,10 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 export const setupAxiosInterceptors = () => {
+  console.log("setupAxiosInterceptors...");
   api.interceptors.request.use(async (config) => {
     const session = await getSession();
+    console.log("axios:", session);
 
     if (session?.user?.accessToken) {
       config.headers.Authorization = `Bearer ${session.user.accessToken}`;
@@ -69,9 +70,12 @@ export const setupAxiosInterceptors = () => {
         isRefreshing = true;
 
         try {
-          const { data } = await api.post("/auth/refresh", {
-            refresh_token: refreshToken,
-          });
+          originalRequest.headers.Authorization = "Bearer " + refreshToken;
+          const { data } = await api.post(
+            "/auth/refresh-token",
+            {},
+            originalRequest
+          );
 
           const newAccessToken = data.access_token;
 

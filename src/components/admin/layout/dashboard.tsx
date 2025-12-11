@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import type { FC } from "react";
 
 import Link from "next/link";
@@ -18,7 +18,7 @@ import {
   Bell,
   Search,
 } from "lucide-react";
-import { LayoutProps, MenuProps } from "@/lib/types";
+import { LayoutProps, MenuProps } from "@/types";
 import { ThemeProvider } from "../../shared/theme-provider";
 import {
   Toaster,
@@ -35,11 +35,12 @@ import {
   SidebarHeader,
 } from "../../ui";
 import { logoGreen } from "@/assets/svg";
-import { profileAvatarImg } from "@/assets/raster";
+import { profileAvatarImg } from "@/assets/images";
 
 const Layout: FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
-  // const { data: session } = useSession();
+
+  const { data: session } = useSession();
 
   const navigation: MenuProps[] = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
@@ -60,6 +61,8 @@ const Layout: FC<LayoutProps> = ({ children }) => {
 
     return routePath.startsWith(sidebarPath);
   };
+
+  console.log("dashbaord:", session);
 
   return (
     <ThemeProvider
@@ -197,7 +200,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                     <DropdownMenuItem
                       onClick={() => {
                         console.log("logging out...");
-                        // signOut({ callbackUrl: "/login" })
+                        signOut({ callbackUrl: "/admin/login" });
                       }}
                       className="text-red-600"
                     >

@@ -3,8 +3,7 @@
 import { Fragment } from "react";
 import type { FC } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { LayoutProps } from "@/lib/types";
+import { LayoutProps } from "@/types";
 import Image from "next/image";
 import { logoGreen, logoWhite } from "@/assets/svg";
 

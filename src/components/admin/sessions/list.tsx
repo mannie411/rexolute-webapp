@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Therapist } from "@/lib/types";
+import { Therapist } from "@/types";
 import { SessionCard } from "./session-cards";
 
 type ListMode = "total" | "therapists";

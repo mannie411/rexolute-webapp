@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import type { GetServerSideProps } from "next";
 import { Head } from "@/components/shared";
 import dynamic from "next/dynamic";
-import { DetailsMode } from "@/lib/types";
+import { DetailsMode } from "@/types";
 
 const SessionDetails = dynamic(
   () => import("@/components/admin/sessions/details")

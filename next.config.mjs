@@ -15,6 +15,22 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'fs' module on the client to prevent errors
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        canvas: false,
+        worker_threads: false,
+      };
+    }
+
+    return config;
+  },
+
+  // Important: Ensure proper transpilation
+  transpilePackages: ["pdfjs-dist", "react-pdf", "react-doc-viewer"],
   allowedDevOrigins: ["app.localhost", "admin.localhost"],
   async redirects() {
     return [

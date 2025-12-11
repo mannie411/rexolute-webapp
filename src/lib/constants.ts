@@ -45,3 +45,27 @@ export const pendingTherapists = [
     profileImg: "avatar2.png",
   },
 ];
+
+export const therapistApprovalSteps = [
+  {
+    id: "professional",
+    title: "Validate professional info.",
+    heading: "Approve professional details",
+    description:
+      "Ensure that all information aligns with the uploaded supporting documents",
+  },
+  {
+    id: "educational",
+    title: "Validate educational info.",
+    heading: "Approve educational details",
+    description:
+      "Verify the educational certifications, ensuring consistency with the provided documents.",
+  },
+  {
+    id: "identity",
+    title: "Validate identity info.",
+    heading: "Approve identity details",
+    description:
+      "Confirm personal details is consistent with the uploaded identification.",
+  },
+];

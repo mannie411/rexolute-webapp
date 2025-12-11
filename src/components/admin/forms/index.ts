@@ -4,6 +4,8 @@ import LoginForm from "./login";
 import ForgotPasswordForm from "./forgot";
 import VerifyOTPForm from "./verify-otp";
 
+export * from "./profile";
+
 export {
   CreatePasswordForm,
   CreatePINForm,

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getSession } from "next-auth/react";
@@ -21,15 +21,53 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/ui";
-import { MoreVertical } from "lucide-react";
+import { ArrowRight, MoreVertical } from "lucide-react";
 import {
   pendingSessions,
   pendingStudents,
   pendingTherapists,
 } from "@/lib/constants";
+import { parseAxiosError, setupAxiosInterceptors } from "@/lib/api";
+import { useAxiosInterceptors } from "@/hooks";
 
-const Page = () => {
+const Page = (props: any) => {
   const [currtTab, setCurrTab] = useState<string>("therapists");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [newTherapists, setNewTherapists] = useState<any[]>(pendingTherapists);
+  const [therapySessions, setTherapySessions] = useState<[]>(
+    props?.pendingSessions ?? []
+  );
+  const [newStudents, setNewStudents] = useState<[]>(
+    props?.pendingStudents ?? []
+  );
+
+  const api = useAxiosInterceptors();
+
+  const fetchNewTherapist = async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.get(
+        "/users/profiles?profileType=therapists&where=is_approved:false,is_onboarded:true"
+      );
+      console.log(newTherapists);
+      const { data } = res.data;
+      if (data) {
+        setNewTherapists(data);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      const e = parseAxiosError(error);
+      console.log(e);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNewTherapist();
+    return () => {};
+  }, []);
+
+  console.log("task:", props);
   return (
     <Fragment>
       <Head title="Pending Tasks" />
@@ -54,6 +92,8 @@ const Page = () => {
             <TabsTrigger value="therapists">Profile set-up </TabsTrigger>
             <TabsTrigger value="students">Student registration </TabsTrigger>
           </TabsList>
+
+          {/* Reassign Session */}
           <TabsContent value="sessions">
             <div className="rounded-md border">
               <Table>
@@ -68,7 +108,7 @@ const Page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pendingTherapists.map((therapist) => (
+                  {newStudents.map((therapist: any) => (
                     <TableRow key={therapist.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -94,7 +134,14 @@ const Page = () => {
                       <TableCell>{therapist.degree}</TableCell>
                       <TableCell>{therapist.experience}</TableCell>
                       <TableCell>
-                        <DropdownMenu>
+                        <Link
+                          href="/admin/therapists/verification/profile-setup"
+                          aria-label="View details"
+                          title="View details"
+                        >
+                          <ArrowRight />
+                        </Link>
+                        {/* <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                               <MoreVertical className="h-4 w-4" />
@@ -110,7 +157,7 @@ const Page = () => {
                             <DropdownMenuItem>Reject</DropdownMenuItem>
                             <DropdownMenuItem>Approve</DropdownMenuItem>
                           </DropdownMenuContent>
-                        </DropdownMenu>
+                        </DropdownMenu> */}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -118,47 +165,62 @@ const Page = () => {
               </Table>
             </div>
           </TabsContent>
+
+          {/*  New Therapist */}
           <TabsContent value="therapists">
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Therapist name</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Gender</TableHead>
-                    <TableHead>Highest degree</TableHead>
-                    <TableHead>Years of experience</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingTherapists.map((therapist) => (
-                    <TableRow key={therapist.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 overflow-hidden rounded-full">
-                            <Image
-                              src={`/graphics/raster/${therapist.profileImg}?height=40&width=40`}
-                              alt={therapist.name}
-                              width={40}
-                              height={40}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <div className="font-medium">{therapist.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {therapist.email}
+            {!isLoading && (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Therapist name</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Gender</TableHead>
+                      <TableHead>Highest degree</TableHead>
+                      <TableHead>Years of experience</TableHead>
+                      <TableHead></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {newTherapists.map((therapist: any) => (
+                      <TableRow key={therapist.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 overflow-hidden rounded-full">
+                              <Image
+                                src={
+                                  therapist.profileImage ??
+                                  "/graphics/svg/placeholder.svg"
+                                }
+                                alt={therapist.name}
+                                width={40}
+                                height={40}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div>
+                              <div className="font-medium">
+                                {therapist.name}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {therapist.email}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{therapist.date}</TableCell>
-                      <TableCell>{therapist.gender}</TableCell>
-                      <TableCell>{therapist.degree}</TableCell>
-                      <TableCell>{therapist.experience}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
+                        </TableCell>
+                        <TableCell>{therapist.date}</TableCell>
+                        <TableCell>{therapist.gender}</TableCell>
+                        <TableCell>{therapist.degree}</TableCell>
+                        <TableCell>{therapist.experience}</TableCell>
+                        <TableCell>
+                          <Link
+                            href="/admin/therapists/verification/profile-setup"
+                            aria-label="View details"
+                            title="View details"
+                          >
+                            <ArrowRight />
+                          </Link>
+                          {/* <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                               <MoreVertical className="h-4 w-4" />
@@ -174,14 +236,17 @@ const Page = () => {
                             <DropdownMenuItem>Reject</DropdownMenuItem>
                             <DropdownMenuItem>Approve</DropdownMenuItem>
                           </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                        </DropdownMenu> */}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </TabsContent>
+
+          {/* New Students */}
           <TabsContent value="students">
             <div className="rounded-md border">
               <Table>
@@ -196,7 +261,7 @@ const Page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pendingTherapists.map((therapist) => (
+                  {newStudents.map((therapist: any) => (
                     <TableRow key={therapist.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -222,7 +287,14 @@ const Page = () => {
                       <TableCell>{therapist.degree}</TableCell>
                       <TableCell>{therapist.experience}</TableCell>
                       <TableCell>
-                        <DropdownMenu>
+                        <Link
+                          href="/admin/therapists/verification/profile-setup"
+                          aria-label="View details"
+                          title="View details"
+                        >
+                          <ArrowRight />
+                        </Link>
+                        {/* <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                               <MoreVertical className="h-4 w-4" />
@@ -238,7 +310,7 @@ const Page = () => {
                             <DropdownMenuItem>Reject</DropdownMenuItem>
                             <DropdownMenuItem>Approve</DropdownMenuItem>
                           </DropdownMenuContent>
-                        </DropdownMenu>
+                        </DropdownMenu> */}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -253,16 +325,16 @@ const Page = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  // const session = await getSession(context);
+  const session = await getSession(context);
 
-  // if (!session) {
-  //   return {
-  //     redirect: {
-  //       destination: "/login",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/admin/login",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
