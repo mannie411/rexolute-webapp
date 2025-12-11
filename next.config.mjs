@@ -14,10 +14,13 @@ const nextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
-    esmExternals: "loose",
+    // esmExternals: "loose",
+    legacyBrowsers: false,
+    outputFileTracingExcludes: ["**canvas**"],
   },
 
   webpack: (config, { isServer }) => {
+    config.externals = [...config.externals, "canvas", "jsdom"];
     if (!isServer) {
       config.module.rules.push({
         test: /canvas/,
