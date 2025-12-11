@@ -88,6 +88,6 @@
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">= 1.22.5",
-    "node": ">=24.1.1"
+    "node": ">=22.21.1"
   }
 }
