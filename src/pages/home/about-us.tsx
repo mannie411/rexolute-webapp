@@ -26,7 +26,7 @@ const Page = () => {
             </div>
             <div className="max-w-6xl mx-auto px-6 my-12">
               <img
-                src="/graphics/raster/about-1.webp"
+                src="/images/about-1.webp"
                 alt="About Rexolute"
                 className="w-full rounded-lg shadow-lg"
               />
@@ -73,7 +73,7 @@ const Page = () => {
               {/* Team Member 1 */}
               <div className="text-center">
                 <img
-                  src="/pictures/executives/whatever-happens-im-ready-to-face-it.jpg"
+                  src="/images/executives/whatever-happens-im-ready-to-face-it.jpg"
                   alt="Team Member 1"
                   className="w-42 h-42 rounded-md object-cover mx-auto mb-4"
                 />
@@ -84,7 +84,7 @@ const Page = () => {
               {/* Team Member 2 */}
               <div className="text-center">
                 <img
-                  src="/pictures/executives/well-im-not-in-the-mood-for-any-jokes-today.jpg"
+                  src="/images/executives/well-im-not-in-the-mood-for-any-jokes-today.jpg"
                   alt="Team Member 2"
                   className="w-42 h-42 rounded-md object-cover mx-auto mb-4"
                 />
@@ -95,7 +95,7 @@ const Page = () => {
               {/* Team Member 3 */}
               <div className="text-center">
                 <img
-                  src="/pictures/executives/ready-for-a-date.jpg"
+                  src="/images/executives/ready-for-a-date.jpg"
                   alt="Team Member 3"
                   className="w-42 h-42 rounded-md object-cover mx-auto mb-4"
                 />
@@ -106,7 +106,7 @@ const Page = () => {
               {/* Team Member 4 */}
               <div className="text-center">
                 <img
-                  src="/pictures/executives/looking-at-the-day-ahead.jpg"
+                  src="/images/executives/looking-at-the-day-ahead.jpg"
                   alt="Team Member 4"
                   className="w-42 h-42 rounded-md object-cover mx-auto mb-4"
                 />

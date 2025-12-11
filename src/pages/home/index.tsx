@@ -57,7 +57,7 @@ const Page = () => {
               <div className="flex items-center justify-center">
                 <div className="h-full w-full">
                   <Image
-                    src="/pictures/pic1.jpg"
+                    src="/images/pic1.jpg"
                     alt="Therapy Illustration"
                     width={600}
                     height={600}
@@ -89,7 +89,7 @@ const Page = () => {
           <div className="flex flex-row py-16">
             <div className="flex justify-start md:w-1/2">
               <Image
-                src="/pictures/pic2.jpg"
+                src="/images/pic2.jpg"
                 alt="Mental Wellness Visual"
                 width={800}
                 height={600}
@@ -150,7 +150,7 @@ const Page = () => {
         <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] mt-12 mb-16">
           <div className="flex w-full">
             <Image
-              src="/pictures/pic3.png"
+              src="/images/pic3.png"
               alt="Visual 1"
               width={0}
               height={0}
@@ -158,7 +158,7 @@ const Page = () => {
               className="w-1/3 h-auto object-cover"
             />
             <Image
-              src="/pictures/pic4.png"
+              src="/images/pic4.png"
               alt="Visual 2"
               width={0}
               height={0}
@@ -166,7 +166,7 @@ const Page = () => {
               className="w-1/3 h-auto object-cover"
             />
             <Image
-              src="/pictures/pic5.png"
+              src="/images/pic5.png"
               alt="Visual 3"
               width={0}
               height={0}
@@ -240,7 +240,7 @@ const Page = () => {
             {/* Right side image */}
             <div className="md:w-1/2 flex justify-end">
               <Image
-                src="/pictures/pic6.jpg"
+                src="/images/pic6.jpg"
                 alt="Next Visual"
                 width={800}
                 height={600}
@@ -270,7 +270,7 @@ const Page = () => {
               {/* LEFT IMAGE */}
               <div className="flex justify-start pl-20">
                 <Image
-                  src="/pictures/pic7.jpg"
+                  src="/images/pic7.jpg"
                   alt="How it works illustration"
                   width={500}
                   height={200}
@@ -470,7 +470,7 @@ const Page = () => {
               {/* Right side: Image */}
               <div className="flex-1 flex items-end">
                 <Image
-                  src="/graphics/raster/rexolute-mock8.webp"
+                  src="/images/rexolute-mock8.webp"
                   alt="Mobile App"
                   width={300}
                   height={300}
@@ -526,7 +526,7 @@ const Page = () => {
               {/* Right side image */}
               <div className="md:w-1/2 flex justify-center">
                 <Image
-                  src="/pictures/pic10.png"
+                  src="/images/pic10.png"
                   alt="Team"
                   width={400}
                   height={400}
