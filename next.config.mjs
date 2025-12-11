@@ -37,7 +37,7 @@ const nextConfig = {
   },
 
   // Important: Ensure proper transpilation
-  transpilePackages: ["pdfjs-dist", "react-pdf", "react-doc-viewer", "canvas"],
+  transpilePackages: ["pdfjs-dist", "react-pdf", "react-doc-viewer"],
   allowedDevOrigins: ["app.localhost", "admin.localhost"],
   async redirects() {
     return [
