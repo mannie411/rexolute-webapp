@@ -36,6 +36,7 @@ import {
 } from "../../ui";
 import { logoGreen } from "@/assets/svg";
 import { profileAvatarImg } from "@/assets/images";
+import { SharedLayoutProvider } from "@/components/shared";
 
 const Layout: FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
@@ -138,6 +139,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           </SidebarContent>
           <SidebarFooter>{/* <SidebarTrigger /> */}</SidebarFooter>
         </Sidebar>
+
         <div className="w-screen">
           {/* Top header */}
           <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
@@ -211,11 +213,15 @@ const Layout: FC<LayoutProps> = ({ children }) => {
               </div>
             </div>
           </header>
-          {/* Main content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Page content */}
-            <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
-          </div>
+          <SharedLayoutProvider>
+            {/* Main content */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Page content */}
+              <main className="flex-1 overflow-auto bg-gray-50">
+                {children}
+              </main>
+            </div>
+          </SharedLayoutProvider>
         </div>
       </SidebarProvider>
     </ThemeProvider>

@@ -6,5 +6,6 @@ import ErrorBoundary from "./withErrorBoundary";
 
 export * from "./icons";
 export * from "./file-viewer";
+export * from "./layout-provider";
 
 export { Head, NoSSR, DetectOutsideClick, ErrorBoundary, ReactPortal };

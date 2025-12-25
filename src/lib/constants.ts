@@ -69,3 +69,39 @@ export const therapistApprovalSteps = [
       "Confirm personal details is consistent with the uploaded identification.",
   },
 ];
+
+export // Mock data for the therapist profile
+const therapistData = {
+  name: "James Bully",
+  email: "Quotientspecialist@gmail.com",
+  phone: "08105201636",
+  professional: {
+    issuingAuthority: "Therapist board",
+    licenseNumber: "124563780",
+    yearsOfExperience: "5 years",
+  },
+  education: {
+    highestDegree: "B.sc",
+    institution: "University of Benin",
+  },
+  identity: {
+    sex: "Male",
+    dateOfBirth: "24th July,1996",
+    idType: "National ID",
+    countryOfResidence: "Nigeria",
+  },
+  expertise: [
+    "Adult and Aging Issues",
+    "Anxiety",
+    "Disabilities",
+    "Personality disorder",
+    "Psychosomatic Problems",
+    "Career and Life adjustment",
+  ],
+  specialties: ["Guidance and counselling", "Psychiatry"],
+};
+
+export const accountApproval = "account.approved",
+  accountRejected = "account.rejected",
+  therapySchedule = "therapy.scheduled",
+  therapyReschedule = "therapy.resheduled";

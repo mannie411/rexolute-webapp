@@ -1,4 +1,12 @@
-import React, { useState, useRef, useCallback, useMemo, Fragment } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  Fragment,
+  useEffect,
+  FC,
+} from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { DocViewerRenderers, type DocViewerProps } from "react-doc-viewer";
@@ -20,11 +28,17 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
   Separator,
 } from "@/components/ui";
 
-import { FileType } from "@/types";
-import { getFileType } from "@/lib/utils";
+import { FileType, GalleryItem } from "@/types";
+import { cn, getFileType } from "@/lib/utils";
 
 // Type for the animated spring values
 type AnimatedStyle = {
@@ -57,6 +71,11 @@ interface ViewerActions {
   prevPage: () => void;
   download: () => void;
   onPDFLoad: ({ numPages }: { numPages: number }) => void;
+}
+
+interface FileGalleryProps {
+  items: GalleryItem[];
+  itemsPerPage?: number;
 }
 
 export type FilesProps = {
@@ -398,6 +417,221 @@ const FileViewerClient = ({ fileUrl, filename }: FilesProps) => {
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+export const DocumentViewer: FC<FilesProps> = ({ fileUrl, filename }) => {
+  const { state, actions } = useFileViewer(fileUrl, filename);
+  const { zoomIn, zoomOut, resetView, rotate, prevPage, nextPage, download } =
+    actions;
+  const { containerRef } = state;
+
+  return (
+    <div className="relative">
+      <div
+        className="aspect-[16/10] overflow-hidden rounded-md touch-none"
+        ref={containerRef}
+      >
+        {/* <Image
+          src="/graphics/svg/placeholder.svg?height=300&width=500"
+          alt="Professional License"
+          width={500}
+          height={300}
+          className="h-full w-full object-cover"
+        /> */}
+
+        <ViewerContent
+          fileUrl={fileUrl}
+          filename={filename}
+          state={state}
+          actions={actions}
+        />
+      </div>
+
+      {/* <Button
+        variant="ghost"
+        size="icon"
+        className="absolute bottom-2  h-8 w-8 rounded-full bg-white shadow-md"
+      >
+        <Search className="h-4 w-4" />
+        <span className="sr-only">Zoom</span>
+      </Button> */}
+
+      <div className="absolute bottom-2 right-2 flex flex-col gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={zoomIn}
+          title="Zoom In"
+          className="h-8 w-8 rounded-full bg-white shadow-md"
+        >
+          <ZoomIn className="h-4 w-4" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={zoomOut}
+          title="Zoom Out"
+          className="h-8 w-8 rounded-full bg-white shadow-md"
+        >
+          <ZoomOut className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export const PaginatedDocument = ({
+  items,
+  itemsPerPage = 3,
+}: FileGalleryProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const activeItem = items[activeIndex];
+
+  // 1. Pagination Logic for Thumbnails
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+
+  const currentThumbnails = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return items.slice(start, start + itemsPerPage);
+  }, [currentPage, items, itemsPerPage]);
+
+  // 2. Navigation for the Feature Preview
+  const nextPreview = () => setActiveIndex((prev) => (prev + 1) % items.length);
+  const prevPreview = () =>
+    setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
+
+  // 3. Auto-jump pagination when active index changes via buttons
+  useEffect(() => {
+    const targetPage = Math.floor(activeIndex / itemsPerPage) + 1;
+    if (targetPage !== currentPage) {
+      setCurrentPage(targetPage);
+    }
+  }, [activeIndex, itemsPerPage]);
+
+  console.log(currentThumbnails.length);
+
+  return (
+    <Fragment>
+      <DocumentViewer fileUrl={activeItem.url} filename={activeItem.title} />
+
+      {items.length > 1 && (
+        <div className="flex justify-center items-center my-4 gap-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={prevPreview}
+          >
+            <ChevronLeft className="h-8 w-8" />
+          </Button>
+
+          <div className="flex gap-2 my-4">
+            {currentThumbnails.map((item) => {
+              const globalIndex = items.findIndex((i) => i.id === item.id);
+              const isActive = activeIndex === globalIndex;
+
+              return (
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "transition-all duration-200 overflow-hidden p-0 ",
+                    isActive ? "bg-primary w-2 h-1" : "h-2 w-2 bg-secondary"
+                  )}
+                >
+                  <span></span>
+                </Button>
+              );
+            })}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={nextPreview}
+          >
+            <ChevronRight className="h-8 w-8" />
+          </Button>
+        </div>
+      )}
+
+      {/* <div className="flex gap-2">
+        {currentThumbnails.map((item) => {
+          const globalIndex = items.findIndex((i) => i.id === item.id);
+          const isActive = activeIndex === globalIndex;
+
+          return (
+     
+            <Card
+              key={item.id}
+              className={`cursor-pointer transition-all duration-200 overflow-hidden ${
+                isActive
+                  ? "ring-4 ring-primary ring-offset-2"
+                  : "opacity-70 hover:opacity-100"
+              }`}
+              onClick={() => setActiveIndex(globalIndex)}
+            >
+              <CardContent className="p-0">
+                <img
+                  src={item.url}
+                  alt={item.title}
+                  className="w-full h-24 object-cover"
+                />
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div> */}
+
+      {/* 
+      {totalPages > 1 && (
+        <div className="pt-2">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  className={
+                    currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={currentPage === i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className="cursor-pointer"
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  className={
+                    currentPage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(p + 1, totalPages))
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )} */}
+    </Fragment>
   );
 };
 

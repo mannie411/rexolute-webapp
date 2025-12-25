@@ -9,6 +9,9 @@ import type {
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 
+export * from "./app";
+export * from "./user";
+
 export type QueryReturnValue<T = unknown, E = unknown, M = unknown> =
   | {
       error: E;
@@ -70,18 +73,6 @@ export type SiteMode = "isLive" | "isComingSoon" | "isMaintenance";
 
 export type TabItem = { active: boolean; id: string; label: string };
 
-export type TreatmentTypes =
-  | "Positive"
-  | "Neutral"
-  | "Negative"
-  | "Cited by counsel";
-
-export type BigBarForRightSideLayoutProps = {
-  title: string;
-  icon?: React.ReactElement;
-  style: { ctnStyle: string; icon: string };
-};
-
 export type MenuLink = LinkProps & {
   icon?: ReactElement;
   children?: MenuLink[];
@@ -108,26 +99,6 @@ export type MenuProps = {
 
 export type Role = "admin" | "anonymous" | "client" | "therapist" | "unknown";
 
-export type User = {
-  id?: string;
-  name: string;
-  email: string;
-  gender: string;
-  profileImg: string;
-  role: Role;
-};
-
-export type Therapist = User & {
-  degree: string;
-  experience: string;
-  specialty: number;
-  rating: number;
-};
-
-export type Client = User & {
-  type: "default" | "student";
-};
-
 export type DetailsMode = "approve" | "default" | "reassign" | "rescheduled ";
 
 /**
@@ -147,3 +118,10 @@ export interface PageProps {
 }
 
 export type FileType = "pdf" | "image" | "doc" | "unsupported";
+
+export type ResponseList = {
+  currentPage: number;
+  items: any[];
+  totalCount: number;
+  totalPages: number;
+};

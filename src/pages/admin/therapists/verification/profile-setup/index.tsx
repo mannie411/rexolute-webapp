@@ -1,11 +1,9 @@
 "use client";
 
-import { FC, Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Check, Search, ZoomIn, ZoomOut } from "lucide-react";
-
+import { ArrowLeft } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
@@ -14,58 +12,40 @@ import {
   CardContent,
   Tabs,
   TabsContent,
+  Skeleton,
 } from "@/components/ui";
-import {
-  CheckIcon,
-  Head,
-  useFileViewer,
-  ViewerContent,
-} from "@/components/shared";
-import { type FilesProps } from "@/components/shared";
+import { CheckIcon, Head, PaginatedDocument } from "@/components/shared";
 
-import { useToast } from "@/hooks";
+import { useAxiosInterceptors, useToast } from "@/hooks";
 import {
   ApproveForm,
   ApproveFormSchema,
   RejectForm,
   RejectFormSchema,
 } from "@/components/admin/forms";
-import { therapistApprovalSteps as steps } from "@/lib/constants";
-
-// Mock data for the therapist profile
-const therapistData = {
-  name: "James Bully",
-  email: "Quotientspecialist@gmail.com",
-  phone: "08105201636",
-  professional: {
-    issuingAuthority: "Therapist board",
-    licenseNumber: "124563780",
-    yearsOfExperience: "5 years",
-  },
-  education: {
-    highestDegree: "B.sc",
-    institution: "University of Benin",
-  },
-  identity: {
-    sex: "Male",
-    dateOfBirth: "24th July,1996",
-    idType: "National ID",
-    countryOfResidence: "Nigeria",
-  },
-  expertise: [
-    "Adult and Aging Issues",
-    "Anxiety",
-    "Disabilities",
-    "Personality disorder",
-    "Psychosomatic Problems",
-    "Career and Life adjustment",
-  ],
-  specialties: ["Guidance and counselling", "Psychiatry"],
-};
+import {
+  accountApproval,
+  accountRejected,
+  therapistApprovalSteps as steps,
+} from "@/lib/constants";
+import { useSharedData } from "@/hooks/use-layout";
+import {
+  AccountApproval,
+  AccountRejected,
+  GalleryItem,
+  Reason,
+  Task,
+  TherapistProfile,
+} from "@/types";
+import {
+  capitalizeFirstLetter,
+  DateTimeFormatter as datetime,
+} from "@/lib/utils";
 
 type TabStep = {
   id: string;
   valid: "valid" | "invalid";
+  data: Reason | null;
 };
 
 const Compare = () => {
@@ -104,76 +84,29 @@ const Compare = () => {
   );
 };
 
-const DocumentViewer: FC<FilesProps> = ({ fileUrl, filename }) => {
-  const { state, actions } = useFileViewer(fileUrl, filename);
-  const { zoomIn, zoomOut, resetView, rotate, prevPage, nextPage, download } =
-    actions;
-  const { containerRef } = state;
-
-  return (
-    <div className="relative">
-      <div
-        className="aspect-[16/10] overflow-hidden rounded-md touch-none"
-        ref={containerRef}
-      >
-        {/* <Image
-          src="/graphics/svg/placeholder.svg?height=300&width=500"
-          alt="Professional License"
-          width={500}
-          height={300}
-          className="h-full w-full object-cover"
-        /> */}
-
-        <ViewerContent
-          fileUrl={fileUrl}
-          filename={filename}
-          state={state}
-          actions={actions}
-        />
-      </div>
-
-      {/* <Button
-        variant="ghost"
-        size="icon"
-        className="absolute bottom-2  h-8 w-8 rounded-full bg-white shadow-md"
-      >
-        <Search className="h-4 w-4" />
-        <span className="sr-only">Zoom</span>
-      </Button> */}
-
-      <div className="absolute bottom-2 right-2 flex flex-col gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={zoomIn}
-          title="Zoom In"
-          className="h-8 w-8 rounded-full bg-white shadow-md"
-        >
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={zoomOut}
-          title="Zoom Out"
-          className="h-8 w-8 rounded-full bg-white shadow-md"
-        >
-          <ZoomOut className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
-};
-
 export default function ProfileSetupPage() {
+  const {
+    setIsLoading: setIsLoadingData,
+    isLoading: isLoadingData,
+    data: contextData,
+  } = useSharedData();
+  const { toast } = useToast();
+  const router = useRouter();
+  const api = useAxiosInterceptors();
+
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [isApprovedOpen, setIsApprovedOpen] = useState(false);
-
   const [activeStep, setActiveStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<TabStep[]>([]);
-  const router = useRouter();
-  const { toast } = useToast();
+  const [data, setData] = useState<TherapistProfile | null>(null);
+  const [docs, setDocs] = useState<GalleryItem[]>([]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      processContextData();
+    }, 1000);
+    return () => {};
+  }, [isLoadingData]);
 
   const handleStepChange = (tab: TabStep) => {
     if (activeStep < steps.length - 1) {
@@ -188,409 +121,532 @@ export default function ProfileSetupPage() {
     setActiveStep(index);
   };
 
-  const onRejectSubmit = async (value: RejectFormSchema) => {
+  const onSubmit = async (value: ApproveFormSchema | RejectFormSchema) => {
     console.log("submitting...", value);
 
-    // await new Promise((resolve, reject) => {
-    //   setTimeout(() => {
-    //     resolve({ data: "success!" });
-    //   }, 3000);
-    // });
-
-    // await new Promise((resolve, reject) => {
-    //   setTimeout(() => {
-    //     reject(new Error("Async operation failed after 1 second"));
-    //   }, 5000);
-    // });
-
     if (activeStep >= steps.length - 1) {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve({ data: "success!" });
-        }, 3000);
-      });
+      const steps = completedSteps.filter(({ data }) => data !== null);
+      let reasons: Reason[] = [
+        ...steps.map(({ data, id }) => ({
+          ...data!,
+          value: `${data?.value} (${capitalizeFirstLetter(id)} Documents)`,
+        })),
+      ];
+
+      if ("reason" in value) {
+        reasons.push({
+          value: `${value.reason} (Identification Documents)`,
+          comment: value.comment,
+        });
+      }
+
+      const approvalPayload: AccountApproval = {
+        email: data?.email ?? "",
+        user_id: data?.user_id ?? "",
+        phone_number: data?.phone_number ?? "",
+      };
+
+      const rejectedPayload: AccountRejected = {
+        ...approvalPayload,
+        reasons,
+      };
+
+      const event = reasons.length > 0 ? accountRejected : accountApproval;
+      const payload = reasons.length > 0 ? rejectedPayload : approvalPayload;
+
+      const body: Task = {
+        event,
+        payload,
+      };
+
+      await api.post("/users/account?profileType=therapist", body);
 
       // Final approval
-      toast({
-        variant: "destructive",
-        title: "Profile set-up not approved",
-        description: "James Bully account has not been approved.",
-      });
+      reasons.length > 0
+        ? toast({
+            variant: "destructive",
+            title: "Profile set-up not approved",
+            description: `${data?.name} account has not been approved.`,
+          })
+        : toast({
+            variant: "success",
+            title: "Profile set-up approved",
+            description: `${data?.name} account has been approved.`,
+          });
 
       // Redirect to the dashboard after a short delay
       setTimeout(router.back, 2000);
     }
 
-    handleStepChange({ id: steps[activeStep].id, valid: "invalid" });
-    setIsRejectOpen(false);
+    if ("reason" in value) {
+      // Reject form: mark the current step as invalid with provided reason/comment
+      handleStepChange({
+        id: steps[activeStep].id,
+        valid: "invalid",
+        data: { value: value.reason, comment: value.comment },
+      });
+      setIsRejectOpen(false);
+      return;
+    } else {
+      // Approve form: mark the current step as valid
+      handleStepChange({
+        id: steps[activeStep].id,
+        valid: "valid",
+        data: null,
+      });
+      setIsApprovedOpen(false);
+      return;
+    }
   };
 
-  const onApproveSubmit = async (value: ApproveFormSchema) => {
-    console.log("submitting...", value);
+  // const onApproveSubmit = async (value: ApproveFormSchema) => {
+  // await new Promise((resolve, reject) => {
+  //   setTimeout(() => {
+  //     resolve({ data: "success!" });
+  //   }, 3000);
+  // });
 
-    if (activeStep >= steps.length - 1) {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve({ data: "success!" });
-        }, 3000);
-      });
+  // await new Promise((resolve, reject) => {
+  //   setTimeout(() => {
+  //     reject(new Error("Async operation failed after 1 second"));
+  //   }, 5000);
+  // });
+  // console.log("submitting...", value);
 
-      // Final approval
-      toast({
-        variant: "success",
-        title: "Profile set-up approved",
-        description: "James Bully account has been approved.",
-      });
+  // if (activeStep >= steps.length - 1) {
+  //   await new Promise((resolve, reject) => {
+  //     setTimeout(() => {
+  //       resolve({ data: "success!" });
+  //     }, 3000);
+  //   });
 
-      // Redirect to the dashboard after a short delay
-      setTimeout(() => {
-        router.replace("/admin/therapists");
-      }, 2000);
+  // Final approval
+  //     toast({
+  //       variant: "success",
+  //       title: "Profile set-up approved",
+  //       description: "James Bully account has been approved.",
+  //     });
+
+  //     // Redirect to the dashboard after a short delay
+  //     setTimeout(() => {
+  //       router.replace("/admin/therapists");
+  //     }, 2000);
+  //   }
+
+  //   handleStepChange({ id: steps[activeStep].id, valid: "valid", data: null });
+  //   setIsApprovedOpen(false);
+  // };
+
+  const processContextData = () => {
+    if (contextData !== null && (contextData as TherapistProfile)) {
+      const { doc } = contextData as TherapistProfile;
+      const licenses = doc.licenses.map(({ url }, idx) => ({
+        id: idx,
+        url: url ?? "/cert1.png",
+        title: `image ${idx + 1}`,
+      })) as GalleryItem[];
+
+      console.log(licenses);
+      setDocs(licenses);
+      setData(contextData);
     }
 
-    handleStepChange({ id: steps[activeStep].id, valid: "valid" });
-    setIsApprovedOpen(false);
+    setIsLoadingData(false);
   };
 
   return (
     <Fragment>
       <Head title="Therapist Verification" />
+      <div className="py-6">
+        <div className="flex flex-col gap-6 px-6 mb-12">
+          <div className="flex items-center gap-2">
+            {/* <Link href="/therapist/verification"> */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={router.back}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            {/* </Link> */}
+            <h1 className="text-2xl font-semibold">Review profile setup</h1>
+          </div>
 
-      <div className="flex flex-col gap-6 px-6 mb-12">
-        <div className="flex items-center gap-2">
-          {/* <Link href="/therapist/verification"> */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            onClick={router.back}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          {/* </Link> */}
-          <h1 className="text-2xl font-semibold">Review profile setup</h1>
-        </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Pending task</span>
+            <span className="px-2 py-1 bg-green-100 text-green-600 rounded-full">
+              Profile setup
+            </span>
+          </div>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Pending task</span>
-          <span className="px-2 py-1 bg-green-100 text-green-600 rounded-full">
-            Profile setup
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <Card className="md:col-span-1">
-            <CardContent className="p-6 flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full overflow-hidden mb-4">
-                <Image
-                  src="/graphics/svg/placeholder.svg?height=80&width=80"
-                  alt="James Bully"
-                  width={80}
-                  height={80}
-                  className="object-cover"
-                />
+          {isLoadingData && (
+            <div className="container space-y-2 py-12">
+              <div className="space-y-2 ">
+                <Skeleton className="h-[100px] w-[100%]" />
+                <Skeleton className="h-[65px]  w-[80%]" />
+                <Skeleton className="h-[35px] w-[65%]" />
+                <Skeleton className="h-4 w-[200px]" />
               </div>
-              <h2 className="text-xl font-semibold">{therapistData.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                {therapistData.email}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {therapistData.phone}
-              </p>
-            </CardContent>
-          </Card>
 
-          <Card className="md:col-span-2">
-            <CardContent className="p-6">
-              <div className="mb-6">
-                <h3 className="text-sm font-medium mb-4">
-                  AREA OF EXPERTISE ({therapistData.expertise.length})
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {therapistData.expertise.map((item) => (
-                    <span
-                      key={item}
-                      className="px-3 py-1 bg-gray-100 rounded-full text-sm"
+              <div className="space-y-2 py-12">
+                <Skeleton className="h-[100px] w-[100%]" />
+                <Skeleton className="h-[65px]  w-[80%]" />
+                <Skeleton className="h-[35px] w-[65%]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+              {/* <div className="flex items-center space-x-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[250px]" />
+              <Skeleton className="h-4 w-[200px]" />
+            </div>
+          </div> */}
+            </div>
+          )}
+
+          {!isLoadingData && data && (
+            <Fragment>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Card className="md:col-span-1">
+                  <CardContent className="p-6 flex flex-col items-center text-center">
+                    <div className="w-20 h-20 rounded-full overflow-hidden mb-4">
+                      <Image
+                        src={
+                          data.profile_img ??
+                          "/svg/placeholder.svg?height=80&width=80"
+                        }
+                        alt={data.name}
+                        width={80}
+                        height={80}
+                        className="object-cover"
+                      />
+                    </div>
+                    <h2 className="text-xl font-semibold">{data.name}</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {data.email}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {data.phone_number}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="md:col-span-2">
+                  <CardContent className="p-6">
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium mb-4">
+                        AREA OF EXPERTISE ({data.expertise.length})
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {data.expertise.map((item) => (
+                          <span
+                            key={item?.id}
+                            className="px-3 py-1 bg-gray-100 rounded-full text-sm"
+                          >
+                            {item?.value}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-medium mb-4">
+                        AREA OF SPECIALTIES ({data.specialities.length})
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {data.specialities.map((item) => (
+                          <span
+                            key={item?.id}
+                            className="px-3 py-1 bg-gray-100 rounded-full text-sm"
+                          >
+                            {item?.value}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {steps.map((step, index) => {
+                  const completed = completedSteps.find(
+                    (s) => s.id === step.id
+                  );
+                  const isActive = activeStep === index;
+                  const isUpcoming = index > activeStep;
+
+                  console.log(completed);
+
+                  return (
+                    <Card
+                      key={step.id}
+                      className={`relative ${
+                        isActive ? "ring-2 ring-green-600" : ""
+                      }`}
                     >
-                      {item}
-                    </span>
-                  ))}
-                </div>
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-2">
+                          <div>
+                            <h3 className="font-medium">{step.title}</h3>
+                            <p className="text-xs text-muted-foreground">
+                              {step.description}
+                            </p>
+                          </div>
+                          {completed ? (
+                            <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full ">
+                              <CheckIcon
+                                className="h-3 w-3"
+                                fill={
+                                  completed.valid === "valid"
+                                    ? "#2E8902"
+                                    : "#F04438"
+                                }
+                              />
+                            </div>
+                          ) : (
+                            <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-gray-100">
+                              <span className="text-xs">{index + 1}</span>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
 
-              <div>
-                <h3 className="text-sm font-medium mb-4">
-                  AREA OF SPECIALTIES ({therapistData.specialties.length})
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {therapistData.specialties.map((item) => (
-                    <span
-                      key={item}
-                      className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {steps.map((step, index) => {
-            const completed = completedSteps.find((s) => s.id === step.id);
-            const isActive = activeStep === index;
-            const isUpcoming = index > activeStep;
-
-            console.log(completed);
-
-            return (
-              <Card
-                key={step.id}
-                className={`relative ${
-                  isActive ? "ring-2 ring-green-600" : ""
-                }`}
+              <Tabs
+                value={steps[activeStep].id}
+                onValueChange={handleTabChange}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-2">
-                    <div>
-                      <h3 className="font-medium">{step.title}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {step.description}
-                      </p>
-                    </div>
-                    {completed ? (
-                      <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full ">
-                        <CheckIcon
-                          className="h-3 w-3"
-                          fill={
-                            completed.valid === "valid" ? "#2E8902" : "#F04438"
-                          }
-                        />
-                      </div>
-                    ) : (
-                      <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-gray-100">
-                        <span className="text-xs">{index + 1}</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                <TabsContent value="professional">
+                  <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <Card>
+                      <CardContent className="p-6">
+                        <h3 className="text-lg font-medium mb-6">
+                          USER INFORMATION
+                        </h3>
+                        <div className="space-y-6">
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Full name
+                            </div>
+                            <div className="font-medium">{data.name}</div>
+                          </div>
 
-        <Tabs value={steps[activeStep].id} onValueChange={handleTabChange}>
-          <TabsContent value="professional">
-            <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-medium mb-6">USER INFORMATION</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Full name
-                      </div>
-                      <div className="font-medium">{therapistData.name}</div>
-                    </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Issuing authority
+                            </div>
+                            <div className="font-medium">
+                              {data.doc.license_issuer}
+                            </div>
+                          </div>
 
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Issuing authority
-                      </div>
-                      <div className="font-medium">
-                        {therapistData.professional.issuingAuthority}
-                      </div>
-                    </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Licence number
+                            </div>
+                            <div className="font-medium">
+                              {data.doc.license_number}
+                            </div>
+                          </div>
 
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Licence number
-                      </div>
-                      <div className="font-medium">
-                        {therapistData.professional.licenseNumber}
-                      </div>
-                    </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Years of experience
+                            </div>
+                            <div className="font-medium">
+                              {data.doc.years_exp}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Years of experience
-                      </div>
-                      <div className="font-medium">
-                        {therapistData.professional.yearsOfExperience}
-                      </div>
+                    <Compare />
+
+                    <div className="relative">
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-medium mb-6">
+                            UPLOADED DOCUMENT
+                          </h3>
+
+                          <PaginatedDocument items={docs} />
+
+                          {/* <DocumentViewer
+                          fileUrl={"/cert1.png"}
+                          filename="Professional License"
+                        /> */}
+                        </CardContent>
+                      </Card>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </TabsContent>
 
-              <Compare />
+                <TabsContent value="educational">
+                  <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <Card>
+                      <CardContent className="p-6">
+                        <h3 className="text-lg font-medium mb-6">
+                          USER INFORMATION
+                        </h3>
+                        <div className="space-y-6">
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Full name
+                            </div>
+                            <div className="font-medium">{data.name}</div>
+                          </div>
 
-              <div className="relative">
-                <Card>
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-medium mb-6">
-                      UPLOADED DOCUMENT
-                    </h3>
-                    <DocumentViewer
-                      fileUrl={"/cert1.png"}
-                      filename="Professional License"
-                    />
-                  </CardContent>
-                </Card>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Highest degree earned
+                            </div>
+                            <div className="font-medium">
+                              {data.doc.degree_type}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Institution name
+                            </div>
+                            <div className="font-medium">
+                              {data.doc.degree_issuer}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Compare />
+
+                    <div className="relative">
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-medium mb-6">
+                            UPLOADED DOCUMENT
+                          </h3>
+
+                          <PaginatedDocument items={docs} />
+
+                          {/* <DocumentViewer
+                          fileUrl={"/cert1.png"}
+                          filename="Professional License"
+                        /> */}
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="identity">
+                  <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <Card>
+                      <CardContent className="p-6">
+                        <h3 className="text-lg font-medium mb-6">
+                          USER INFORMATION
+                        </h3>
+                        <div className="space-y-6">
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              Full name
+                            </div>
+                            <div className="font-medium">{data.name}</div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-6">
+                            <div>
+                              <div className="text-sm text-muted-foreground mb-1">
+                                Sex
+                              </div>
+                              <div className="font-medium capitalize">
+                                {data.gender}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-muted-foreground mb-1">
+                                Date of birth
+                              </div>
+                              <div className="font-medium">
+                                {datetime.formatWithPattern(
+                                  datetime.toDateTime(data.dob),
+                                  "D MMM, YYYY"
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-6">
+                            <div>
+                              <div className="text-sm text-muted-foreground mb-1">
+                                ID type
+                              </div>
+                              <div className="font-medium">
+                                {data.doc.id_type}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-muted-foreground mb-1">
+                                Country of residence
+                              </div>
+                              <div className="font-medium">{data.country}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Compare />
+
+                    <div className="relative">
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-medium mb-6">
+                            UPLOADED DOCUMENT
+                          </h3>
+
+                          <PaginatedDocument items={docs} />
+
+                          {/* <DocumentViewer
+                          fileUrl={"/cert1.png"}
+                          filename="Professional License"
+                        /> */}
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <div className="flex justify-end gap-4 mt-4">
+                <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="rounded-3xl w-[20%]">
+                      Reject
+                    </Button>
+                  </DialogTrigger>
+                  <RejectForm
+                    title="Reject Professional information"
+                    callback={onSubmit}
+                  />
+                </Dialog>
+                <Dialog open={isApprovedOpen} onOpenChange={setIsApprovedOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="rounded-3xl w-[20%]">Approve</Button>
+                  </DialogTrigger>
+                  <ApproveForm
+                    title={steps[activeStep].heading}
+                    callback={onSubmit}
+                    steps={steps[activeStep].id}
+                  />
+                </Dialog>
               </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="educational">
-            <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-medium mb-6">USER INFORMATION</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Full name
-                      </div>
-                      <div className="font-medium">{therapistData.name}</div>
-                    </div>
-
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Highest degree earned
-                      </div>
-                      <div className="font-medium">
-                        {therapistData.education.highestDegree}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Institution name
-                      </div>
-                      <div className="font-medium">
-                        {therapistData.education.institution}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Compare />
-
-              <div className="relative">
-                <Card>
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-medium mb-6">
-                      UPLOADED DOCUMENT
-                    </h3>
-
-                    <DocumentViewer
-                      fileUrl={"/cert1.png"}
-                      filename="Educational Certificate"
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="identity">
-            <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-medium mb-6">USER INFORMATION</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Full name
-                      </div>
-                      <div className="font-medium">{therapistData.name}</div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">
-                          Sex
-                        </div>
-                        <div className="font-medium">
-                          {therapistData.identity.sex}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">
-                          Date of birth
-                        </div>
-                        <div className="font-medium">
-                          {therapistData.identity.dateOfBirth}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">
-                          ID type
-                        </div>
-                        <div className="font-medium">
-                          {therapistData.identity.idType}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">
-                          Country of residence
-                        </div>
-                        <div className="font-medium">
-                          {therapistData.identity.countryOfResidence}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Compare />
-
-              <div className="relative">
-                <Card>
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-medium mb-6">
-                      UPLOADED DOCUMENT
-                    </h3>
-
-                    <DocumentViewer
-                      fileUrl={"/cert1.png"}
-                      filename="National ID"
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className="flex justify-end gap-4 mt-4">
-          <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="rounded-3xl w-[20%]">
-                Reject
-              </Button>
-            </DialogTrigger>
-            <RejectForm
-              title="Reject Professional information"
-              callback={onRejectSubmit}
-            />
-          </Dialog>
-          <Dialog open={isApprovedOpen} onOpenChange={setIsApprovedOpen}>
-            <DialogTrigger asChild>
-              <Button className="rounded-3xl w-[20%]">Approve</Button>
-            </DialogTrigger>
-            <ApproveForm
-              title={steps[activeStep].heading}
-              callback={onApproveSubmit}
-              steps={steps[activeStep].id}
-            />
-          </Dialog>
+            </Fragment>
+          )}
         </div>
       </div>
     </Fragment>

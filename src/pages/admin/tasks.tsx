@@ -29,11 +29,17 @@ import {
 } from "@/lib/constants";
 import { parseAxiosError, setupAxiosInterceptors } from "@/lib/api";
 import { useAxiosInterceptors } from "@/hooks";
+import { ResponseList, TherapistProfile } from "@/types";
+import { useRouter } from "next/router";
+import { useSharedData } from "@/hooks/use-layout";
+import { DateTimeFormatter as datetime } from "@/lib/utils";
 
 const Page = (props: any) => {
+  const router = useRouter();
+  const { setData, setIsLoading: setIsLoadingData } = useSharedData();
   const [currtTab, setCurrTab] = useState<string>("therapists");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [newTherapists, setNewTherapists] = useState<any[]>(pendingTherapists);
+  const [newTherapists, setNewTherapists] = useState<any[]>([]);
   const [therapySessions, setTherapySessions] = useState<[]>(
     props?.pendingSessions ?? []
   );
@@ -49,10 +55,11 @@ const Page = (props: any) => {
       const res = await api.get(
         "/users/profiles?profileType=therapists&where=is_approved:false,is_onboarded:true"
       );
-      console.log(newTherapists);
       const { data } = res.data;
       if (data) {
-        setNewTherapists(data);
+        console.log(data);
+        const { items } = data as ResponseList;
+        setNewTherapists(items);
       }
       setIsLoading(false);
     } catch (error) {
@@ -66,6 +73,12 @@ const Page = (props: any) => {
     fetchNewTherapist();
     return () => {};
   }, []);
+
+  const goto = (path: string, data: any) => {
+    setData(data);
+    setIsLoadingData(true);
+    router.push(path);
+  };
 
   console.log("task:", props);
   return (
@@ -182,14 +195,14 @@ const Page = (props: any) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {newTherapists.map((therapist: any) => (
-                      <TableRow key={therapist.id}>
+                    {newTherapists.map((therapist: TherapistProfile) => (
+                      <TableRow key={therapist.user_id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 overflow-hidden rounded-full">
                               <Image
                                 src={
-                                  therapist.profileImage ??
+                                  therapist.profile_img ??
                                   "/graphics/svg/placeholder.svg"
                                 }
                                 alt={therapist.name}
@@ -208,18 +221,33 @@ const Page = (props: any) => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>{therapist.date}</TableCell>
-                        <TableCell>{therapist.gender}</TableCell>
-                        <TableCell>{therapist.degree}</TableCell>
-                        <TableCell>{therapist.experience}</TableCell>
                         <TableCell>
-                          <Link
+                          {datetime.formatWithPattern(
+                            datetime.toDateTime(therapist.dob),
+                            "D MMM, YYYY"
+                          )}
+                        </TableCell>
+                        <TableCell>{therapist.gender}</TableCell>
+                        <TableCell>{therapist.doc.degree_type}</TableCell>
+                        <TableCell>{therapist.doc.years_exp}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            onClick={() =>
+                              goto(
+                                "/admin/therapists/verification/profile-setup",
+                                therapist
+                              )
+                            }
+                          >
+                            <ArrowRight />
+                          </Button>
+                          {/* <Link
                             href="/admin/therapists/verification/profile-setup"
                             aria-label="View details"
                             title="View details"
                           >
-                            <ArrowRight />
-                          </Link>
+                          </Link> */}
                           {/* <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
